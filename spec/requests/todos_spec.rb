@@ -4,9 +4,10 @@ RSpec.describe 'Todos API', type: :request do
   let(:user) { create(:user) }
   let!(:todos) { create_list(:todo, 10, user_id: user.id) }
   let(:todo_id) { todos.first.id }
+  let(:headers) { valid_headers }
 
   describe 'GET /todos' do
-    before { get '/todos' }
+    before { get '/todos', params: {}, headers: headers }
 
     it 'returns todos' do
       expect(json).not_to be_empty
@@ -19,7 +20,7 @@ RSpec.describe 'Todos API', type: :request do
   end
 
   describe 'GET /todos/:id' do
-    before { get "/todos/#{todo_id}" }
+    before { get "/todos/#{todo_id}", params: {}, headers: headers }
 
     context 'when the record exists' do
       it 'returns status code :ok' do
@@ -46,10 +47,10 @@ RSpec.describe 'Todos API', type: :request do
   end
 
   describe 'POST /todos' do
-    let(:valid_attributes) { {title: 'Learn Elm', user_id: user.id} }
+    let(:valid_attributes) { {title: 'Learn Elm', user_id: user.id}.to_json }
 
     context 'when the request is valid' do
-      before { post '/todos', params: valid_attributes }
+      before { post '/todos', params: valid_attributes, headers: headers }
 
       it 'returns status code :created' do
         expect(response).to have_http_status(:created)
@@ -62,7 +63,7 @@ RSpec.describe 'Todos API', type: :request do
 
     context 'when the request is invalid' do
       let(:invalid_attributes) { {title: nil}.to_json }
-      before { post '/todos', params: invalid_attributes }
+      before { post '/todos', params: invalid_attributes, headers: headers }
 
       it 'returns status code :unprocessable_entity' do
         expect(response).to have_http_status(:unprocessable_entity)
@@ -71,10 +72,10 @@ RSpec.describe 'Todos API', type: :request do
   end
 
   describe 'PUT /todos/:id' do
-    let(:valid_attributes) { {title: 'Shopping'} }
+    let(:valid_attributes) { {title: 'Shopping'}.to_json }
 
     context 'when the record exists' do
-      before { put "/todos/#{todo_id}", params: valid_attributes }
+      before { put "/todos/#{todo_id}", params: valid_attributes, headers: headers }
 
       it 'returns status code :ok' do
         expect(response).to have_http_status(:ok)
@@ -88,7 +89,7 @@ RSpec.describe 'Todos API', type: :request do
   end
 
   describe 'DELETE /todos/:id' do
-    before { delete "/todos/#{todo_id}" }
+    before { delete "/todos/#{todo_id}", params: {}, headers: headers }
 
     it 'returns status code :no_content' do
       expect(response).to have_http_status(:no_content)
